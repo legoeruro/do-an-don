@@ -1,3 +1,4 @@
-.rbc-calendar {
-  min-height: 600px;
+.WeekViewCalendar {
+  display: flex;
+  flex-direction: column;
 }

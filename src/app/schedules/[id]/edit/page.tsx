@@ -2,28 +2,32 @@
 
 import { useState } from 'react';
 import { DatesProvider } from "@mantine/dates";
-import WeekCalendar from '@/components/calendar/week/WeekCalendar' 
-import MonthCalendar from '@/components/calendar/month/MonthCalendar'
-import { Button } from '@mantine/core';
+import MonthCalendar from '@/components/calendar/MonthCalendar';
+import WeekView from '@/components/calendar/WeekView';
+import { Button, Grid } from '@mantine/core';
 
 export default function workspace() {
     //w = week, m = month
     const [viewType, setViewType] = useState('w');
-    const CalendarView = viewType === 'w' ? WeekCalendar : MonthCalendar;
     const changeViewType = () => {
         viewType === 'w' ? setViewType('m') : setViewType('w');
     }
     return (
-        <div>
-            <DatesProvider
-                settings={{ locale: 'en'}}
-            >
-                <CalendarView />
-            </DatesProvider>
-            <Button
-                onClick={changeViewType}>
-            </Button>
-            {viewType}
-        </div>
+        <Grid>
+            <Grid.Col span = {3}>
+                <DatesProvider
+                    settings={{ locale: 'en'}}
+                >
+                    <MonthCalendar />
+                </DatesProvider>
+                <Button
+                    onClick={changeViewType}>
+                </Button>
+                {viewType}
+            </Grid.Col>
+            <Grid.Col span = {9}>
+                <WeekView />
+            </Grid.Col>
+        </Grid>
     )
 }
