@@ -1,19 +1,19 @@
-type foodDaySchedule = {
-    breakfast: meal,
-    lunch: lunch,
-    snack: meal, 
+type FoodDaySchedule = {
+    breakfast: Meal,
+    lunch: Lunch,
+    snack: Meal, 
 }
 
-type meal = {
+type Meal = {
     mealId: string,
     mealName: string,
     mealType: string[]
 }
 
 // mirror database setup
-type lunch = {
+type Lunch = {
     is3Course: boolean,
-    mainMeal: meal,
-    stirFry?: meal,
-    soup?: meal
+    mainMeal: Meal,
+    stirFry?: Meal,
+    soup?: Meal
 }
