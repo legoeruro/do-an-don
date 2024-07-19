@@ -1,10 +1,9 @@
-import { Grid, GridCol, Paper } from '@mantine/core';
-import { useState } from 'react';
+import { Grid, GridCol, Paper, Input } from '@mantine/core';
+import { useState, memo } from 'react';
 
 import { DateInfo, RowHeaderInfo } from '../../types/CalendarComponentTypes';
 import EditableString from '../misc/EditableString';
 
-import classes from './calendarStyles.module.css';
 import Cell from './cells/Cell';
 
 interface weekViewProps {
@@ -12,8 +11,8 @@ interface weekViewProps {
 }
 
 // for large viewports
-export default function WeekView(props: weekViewProps) {
-    const datesData = Array.from({length: 7}, () => mockDaySchedule);
+const WeekView = memo((props: weekViewProps) => {
+    const datesData = Array.from({length: 7}, () => ({...mockDaySchedule, date: new Date(Date.now() + Math.random() * 1000000000)}));
 
     const defaultRowHeaderInfo: RowHeaderInfo = {
         breakfastText: 'Breakfast',
@@ -25,29 +24,49 @@ export default function WeekView(props: weekViewProps) {
     };
 
     const [headerInfo, setHeaderInfo] = useState(defaultRowHeaderInfo);
-    
-    return (
-        <>
-            <ColTitle dateInfo={props.dateInfo} />
-            <GridOfDates/>
-            <Grid columns = {8}>
-                    <Grid.Col span={1}>
-                        <Paper shadow='xs'>
-                            <EditableString 
-                                text={headerInfo.breakfastText}
-                                onEditText={(newText) => setHeaderInfo({...headerInfo, breakfastText: newText})}
-                            />
-                        </Paper>
-                    </Grid.Col>
-                    {...datesData.map(daySchedule => 
-                        <Cell>
-                            {daySchedule.breakfast.mealName}
-                        </Cell>
-                        )}
-            </Grid>
+    const [testText, setText] = useState("test");
 
-            <Grid columns = {8}>
-                <Grid.Col span={1}>
+    // For unnecessary rerendering
+    interface BreakfastProps {
+        breakfastText: string,
+        breakfastMeals: {
+            mealName: string,
+            date: Date
+        }[]
+    }
+    const BreakfastBlock = memo( (props: BreakfastProps) => 
+        <Grid columns = {8}>
+                <Cell>
+                    <EditableString 
+                        text={props.breakfastText}
+                        onEditText={(newText) => setHeaderInfo({...headerInfo, breakfastText: newText})}
+                    />
+                </Cell>
+                {...props.breakfastMeals.map(meal => 
+                    <Cell key={meal.date.toString()}>
+                        {
+                            meal.mealName
+                        }
+                    </Cell>
+                    )}
+        </Grid>
+    , (prevProps, nextProps) => {
+        console.log(prevProps);
+        console.log(nextProps);
+        return (
+         prevProps.breakfastText == nextProps.breakfastText 
+         && (prevProps.breakfastMeals.reduce(
+            (acc, meal, index) => 
+            acc && meal.mealName === nextProps.breakfastMeals[index].mealName, true))
+        )
+        }
+    );
+
+
+
+    const LunchBlock = memo( () =>
+        <Grid columns = {8}>
+                <Cell>
                     <Grid columns = {2}>
                         <Grid.Col span={1}>
                             <Paper shadow='xs'>
@@ -78,73 +97,103 @@ export default function WeekView(props: weekViewProps) {
                             </Paper>
                         </Grid.Col>
                     </Grid>
-                </Grid.Col>
+                </Cell>
                 {...datesData.map(daySchedule => 
-                        <Cell>
-                            {elementFromLunch(daySchedule.lunch)}
+                        <Cell key={daySchedule.date.toString()}>
+                            <ElementFromLunch lunch={daySchedule.lunch}/>
                         </Cell>
                 )}
             </Grid>
+    )
 
-            <Grid columns = {8}>
-                <Grid.Col span={1}>
-                    <Paper shadow='xs'>
-                        <EditableString 
-                            text={headerInfo.snackText}
-                            onEditText={(newText) => setHeaderInfo({...headerInfo, snackText: newText})}
-                        />
-                    </Paper>
-                </Grid.Col>
-                {...datesData.map(daySchedule => 
-                            <Cell>
-                                {daySchedule.snack.mealName}
-                            </Cell>
-                )}
-            </Grid>
+    const SnackBlock = memo( () =>
+        <Grid columns = {8}>
+            <Cell>
+                    <EditableString 
+                        text={headerInfo.snackText}
+                        onEditText={(newText) => setHeaderInfo({...headerInfo, snackText: newText})}
+                    />
+            </Cell>
+            {...datesData.map(daySchedule => 
+                        <Cell key={daySchedule.date.toString()}>
+                            {daySchedule.snack.mealName}
+                        </Cell>
+            )}
+        </Grid>
+    )
+    
+    return (
+        <>
+        <div>
+            <h1>Week View</h1>
+            test
+            <Input 
+                value={testText}
+                onChange={(event) => setText(event.currentTarget.value)} 
+            />
+        </div>
+            <ColTitle dateInfo={props.dateInfo} />
+            <GridOfDates isBeginningSpaced={true}/>
+
+            <BreakfastBlock
+                breakfastText={headerInfo.breakfastText}
+                breakfastMeals={datesData.map(daySchedule => ({mealName: daySchedule.breakfast.mealName, date: daySchedule.date}))}    
+            />
+            <LunchBlock/>
+            <SnackBlock/>
         </>
 
     );
-}
+});
 
 
 
-const ColTitle = ({dateInfo, }: {dateInfo: DateInfo}) => {
+const ColTitle = memo(({dateInfo, }: {dateInfo: DateInfo}) => {
     return (
         <Paper shadow='xs'>
             Schedule from {dateInfo.from.toLocaleDateString("vi-VN")} to {dateInfo.to.toLocaleDateString("vi-VN")}    
         </Paper>
     )
-}
+})
 
 const datesOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 // defaults to monday as starting date
-const GridOfDates = () => {
+
+interface gridDateProps {
+    isBeginningSpaced: boolean
+}
+const GridOfDates = memo((props: gridDateProps) => {
     return (
         <Grid columns = {8}>
-            {...datesOfWeek.map(day => <GridCol span={1}>{day}</GridCol>)}
+            {props.isBeginningSpaced && <GridCol span={1}></GridCol>}
+            {...datesOfWeek.map(day => <Cell key={day}>{day}</Cell>)}
         </Grid>)
-}
+})
 
-const elementFromLunch = (lunch: Lunch) => {
+interface elementFromLunchProps {
+    lunch: Lunch
+}
+const ElementFromLunch = memo((props: elementFromLunchProps) => {
     return (
         <>
-        {lunch.is3Course &&
+        {props.lunch.is3Course &&
             <>
-                {lunch.mainMeal.mealName}
+                {props.lunch.mainMeal.mealName}
             </>
         }
-        {!lunch.is3Course && 
+        {!props.lunch.is3Course && 
             <> 
-                {lunch.mainMeal.mealName}
-                {lunch.stirFry?.mealName}
-                {lunch.soup?.mealName }
+                {props.lunch.mainMeal.mealName}
+                {props.lunch.stirFry?.mealName}
+                {props.lunch.soup?.mealName }
             </>
         }
         </>
     )
-}
+})
 
 const mockDaySchedule:FoodDaySchedule = {
+    date: new Date(),
     breakfast: {
         mealId: '1',
         mealName: 'Cereal',
@@ -164,3 +213,6 @@ const mockDaySchedule:FoodDaySchedule = {
         mealType: ['snack']
     }
 }
+
+
+export default WeekView;

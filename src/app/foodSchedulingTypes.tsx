@@ -1,4 +1,5 @@
 type FoodDaySchedule = {
+    date: Date,
     breakfast: Meal,
     lunch: Lunch,
     snack: Meal, 

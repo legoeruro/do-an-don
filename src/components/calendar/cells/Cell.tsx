@@ -5,12 +5,13 @@ import React from "react";
 
 interface CellsProps {
     children?: React.ReactNode,
+    key?: string
 }
 
 export default function Cell(props: CellsProps) {
     return (
-        <Grid.Col span={1} >
-            <Paper shadow='xs' className={classes.gridCell}>
+        <Grid.Col span={1} className = {classes.gridCell}>
+            <Paper shadow='xs' className={classes.paperInCell}>
                 {props.children}
             </Paper>
         </Grid.Col>

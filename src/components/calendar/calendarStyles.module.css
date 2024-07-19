@@ -1,5 +1,12 @@
-.gridCell {
-  height: 50px;
+.paperInCell {
+  display: flex;
+  min-height: 50px;
   width: 100px;
-  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.gridCell {
+  display: flex;
+  justify-content: center;
 }

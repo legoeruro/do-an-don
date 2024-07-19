@@ -6,9 +6,10 @@ import { Button, Grid } from '@mantine/core';
 
 import MonthCalendar from '@/components/calendar/MonthCalendar';
 import WeekView from '@/components/calendar/WeekView';
-import { DateInfo } from '@/components/calendar/CalendarComponentTypes';
 
-export default function workspace() {
+import { DateInfo } from '@/types/CalendarComponentTypes';
+
+export default function Workspace() {
     //w = week, m = month
     const [viewType, setViewType] = useState('w');
     const changeViewType = () => {
