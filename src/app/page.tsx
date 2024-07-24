@@ -6,7 +6,7 @@ export default function Home() {
     return (
         <div>
             <p>hello</p>
-            <Link href="/schedules/1/edit">Create a new schedule</Link>
+            <Link href="/schedules">Create a new schedule</Link>
         </div>
     );
 }

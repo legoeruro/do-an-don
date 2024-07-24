@@ -15,20 +15,18 @@ function Workspace() {
         viewType === 'w' ? setViewType('m') : setViewType('w');
     };
     return (
-        <SchedulerStoreProvider>
-            <Grid>
-                <Grid.Col span={3}>
-                    <DatesProvider settings={{ locale: 'en' }}>
-                        <MonthCalendar />
-                    </DatesProvider>
-                    <Button onClick={changeViewType}></Button>
-                    {viewType}
-                </Grid.Col>
-                <Grid.Col span={9}>
-                    <WeekView />
-                </Grid.Col>
-            </Grid>
-        </SchedulerStoreProvider>
+        <Grid>
+            <Grid.Col span={3}>
+                <DatesProvider settings={{ locale: 'en' }}>
+                    <MonthCalendar />
+                </DatesProvider>
+                <Button onClick={changeViewType}></Button>
+                {viewType}
+            </Grid.Col>
+            <Grid.Col span={9}>
+                <WeekView />
+            </Grid.Col>
+        </Grid>
     );
 }
 

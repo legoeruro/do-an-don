@@ -13,7 +13,7 @@ export interface IStoreProps extends IScheduleSliceProps {}
 export interface IStorePartial
     extends ReturnType<typeof createSchedulerStore> {}
 
-const createSchedulerStore = (initProps?: Partial<IStoreProps>) => {
+export const createSchedulerStore = (initProps?: Partial<IStoreProps>) => {
     return createStore<IStore>((...a) => ({
         ...createScheduleSlice(...a),
         ...initProps,
@@ -21,15 +21,14 @@ const createSchedulerStore = (initProps?: Partial<IStoreProps>) => {
 };
 
 // Provider wrapper for the store
-export const SchedulerStoreContext = createContext<IStorePartial | undefined>(
-    undefined
-);
+export const SchedulerStoreContext = createContext<IStorePartial | null>(null);
 
 interface IBearProviderProps
     extends React.PropsWithChildren<Partial<IStoreProps>> {}
 function SchedulerStoreProvider({ children, ...props }: IBearProviderProps) {
     const storeRef = useRef<IStorePartial>();
     if (!storeRef.current) {
+        console.log('Creating store');
         storeRef.current = createSchedulerStore(props);
     }
     console.log(storeRef.current);

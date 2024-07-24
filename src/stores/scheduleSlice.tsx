@@ -1,6 +1,6 @@
-import { TableHeaderInfo, RowHeaderInfo } from "@/types/CalendarComponentTypes";
-import { FoodDaySchedule } from "@/types/foodSchedulingTypes";
-import { StateCreator } from "zustand";
+import { TableHeaderInfo, RowHeaderInfo } from '@/types/CalendarComponentTypes';
+import { FoodDaySchedule } from '@/types/foodSchedulingTypes';
+import { StateCreator } from 'zustand';
 
 export interface IScheduleSliceProps {
     startingWeekDate: Date;
@@ -25,18 +25,18 @@ export const createScheduleSlice: StateCreator<IScheduleSlice> = (
 ) => ({
     startingWeekDate: new Date(),
     tableHeaderInfo: {
-        fromText: "From",
-        toText: "To",
+        fromText: 'From',
+        toText: 'To',
     },
     rowHeaderInfo: {
-        breakfastText: "Breakfast",
-        lunchText: "Lunch",
-        mainMealText: "Main Meal",
-        stirFryText: "Stir Fry",
-        soupText: "Soup",
-        snackText: "Snack",
+        breakfastText: 'Breakfast',
+        lunchText: 'Lunch',
+        meal1Text: 'Main Meal',
+        meal2Text: 'Stir Fry',
+        meal3Text: 'Soup',
+        snackText: 'Snack',
     },
-    foodSchedules: [],
+    foodSchedules: mockScheduleArray,
 
     updateDateInfo: (newDate: Date) => {
         set(() => ({
@@ -54,6 +54,7 @@ export const createScheduleSlice: StateCreator<IScheduleSlice> = (
         //TODO: update in user preference database
     },
     updateRowHeaderInfo: (newRow: RowHeaderInfo) => {
+        console.log(newRow);
         set(() => ({
             rowHeaderInfo: newRow,
         }));
@@ -68,3 +69,26 @@ export const createScheduleSlice: StateCreator<IScheduleSlice> = (
         //TODO: update in  database
     },
 });
+
+const mockDaySchedule: FoodDaySchedule = {
+    date: new Date(),
+    breakfast: {
+        mealId: '1',
+        mealName: 'Cereal',
+        mealType: ['breakfast'],
+    },
+    lunch: {
+        is3Course: false,
+        meal1: {
+            mealId: '2',
+            mealName: 'Sandwich',
+            mealType: ['lunch'],
+        },
+    },
+    snack: {
+        mealId: '3',
+        mealName: 'Apple',
+        mealType: ['snack'],
+    },
+};
+const mockScheduleArray = Array.from({ length: 7 }, () => mockDaySchedule);

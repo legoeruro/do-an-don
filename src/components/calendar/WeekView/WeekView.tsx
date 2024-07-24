@@ -1,7 +1,7 @@
 import { Grid, GridCol, Paper, Input } from '@mantine/core';
 import { useEffect, useState } from 'react';
 
-import BreakfastBlock from './BreakfastBlock';
+import SingleMealBlock from './SingleMealBlocks';
 
 import { RowHeaderInfo } from '../../../types/CalendarComponentTypes';
 import EditableString from '../../utilities/EditableString';
@@ -10,115 +10,29 @@ import Cell from '../cells/Cell';
 import { FoodDaySchedule, Lunch } from '@/types/foodSchedulingTypes';
 
 import { useSchedulerStoreContext } from '@/stores/useSchedulerStore';
+import { scheduler } from 'timers/promises';
+import CourseMealBlock from './CourseMealBlock';
 
 // for large viewports
 const WeekView = () => {
-    const datesData = Array.from({ length: 7 }, () => ({
-        ...mockDaySchedule,
-        date: new Date(Date.now() + Math.random() * 1000000000),
+    //TODO: replace with actual data
+    const daySchedules = useSchedulerStoreContext(
+        (state) => state.foodSchedules
+    );
+    const datesData = daySchedules.map((schedule) => ({
+        ...schedule,
+        date: new Date(new Date().setHours(0, 0, 0, 0)),
     }));
-
-    const defaultRowHeaderInfo: RowHeaderInfo = {
-        breakfastText: 'Breakfast',
-        lunchText: 'Lunch',
-        mainMealText: 'Main Meal',
-        stirFryText: 'Stir Fry',
-        soupText: 'Soup',
-        snackText: 'Snack',
-    };
 
     const headerInfo = useSchedulerStoreContext((state) => state.rowHeaderInfo);
     const setHeaderInfo = useSchedulerStoreContext(
         (state) => state.updateRowHeaderInfo
-    );
-    const foodSchedules = useSchedulerStoreContext(
-        (state) => state.foodSchedules
     );
     const startingWeekDate = useSchedulerStoreContext(
         (state) => state.startingWeekDate
     );
     const endingWeekDate = new Date(
         startingWeekDate.getDate() + 7 * 24 * 60 * 60 * 1000
-    );
-
-    const LunchBlock = () => (
-        <Grid columns={8}>
-            <Cell>
-                <Grid columns={2}>
-                    <Grid.Col span={1}>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={headerInfo.lunchText}
-                                onEditText={(newText) =>
-                                    setHeaderInfo({
-                                        ...headerInfo,
-                                        lunchText: newText,
-                                    })
-                                }
-                            />
-                        </Paper>
-                    </Grid.Col>
-                    <Grid.Col span={1}>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={headerInfo.mainMealText}
-                                onEditText={(newText) =>
-                                    setHeaderInfo({
-                                        ...headerInfo,
-                                        mainMealText: newText,
-                                    })
-                                }
-                            />
-                        </Paper>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={headerInfo.stirFryText}
-                                onEditText={(newText) =>
-                                    setHeaderInfo({
-                                        ...headerInfo,
-                                        stirFryText: newText,
-                                    })
-                                }
-                            />
-                        </Paper>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={headerInfo.soupText}
-                                onEditText={(newText) =>
-                                    setHeaderInfo({
-                                        ...headerInfo,
-                                        soupText: newText,
-                                    })
-                                }
-                            />
-                        </Paper>
-                    </Grid.Col>
-                </Grid>
-            </Cell>
-            {...datesData.map((daySchedule) => (
-                <Cell key={daySchedule.date.toString()}>
-                    <ElementFromLunch lunch={daySchedule.lunch} />
-                </Cell>
-            ))}
-        </Grid>
-    );
-
-    const SnackBlock = () => (
-        <Grid columns={8}>
-            <Cell>
-                <EditableString
-                    text={headerInfo.snackText}
-                    onEditText={(newText) =>
-                        setHeaderInfo({ ...headerInfo, snackText: newText })
-                    }
-                />
-            </Cell>
-            {...datesData.map((daySchedule) => (
-                <Cell key={daySchedule.date.toString()}>
-                    {daySchedule.snack.mealName}
-                </Cell>
-            ))}
-        </Grid>
     );
 
     return (
@@ -133,18 +47,42 @@ const WeekView = () => {
             />
             <GridOfDates isBeginningSpaced={true} />
 
-            <BreakfastBlock
-                breakfastText={headerInfo.breakfastText}
-                breakfastMeals={datesData.map((daySchedule) => ({
+            <SingleMealBlock
+                headerText={headerInfo.breakfastText}
+                meals={datesData.map((daySchedule) => ({
                     mealName: daySchedule.breakfast.mealName,
                     date: daySchedule.date,
                 }))}
-                setBreakfastText={(newText) =>
+                setHeaderText={(newText) =>
                     setHeaderInfo({ ...headerInfo, breakfastText: newText })
                 }
             />
-            <LunchBlock />
-            <SnackBlock />
+            <CourseMealBlock
+                headerText={headerInfo.lunchText}
+                meal1Text={headerInfo.meal1Text}
+                meal2Text={headerInfo.meal2Text}
+                meal3Text={headerInfo.meal3Text}
+                meals={datesData.map((daySchedule) => ({
+                    lunch: daySchedule.lunch,
+                    date: daySchedule.date,
+                }))}
+                setHeaderText={(newText) =>
+                    setHeaderInfo({
+                        ...headerInfo,
+                        ...newText,
+                    })
+                }
+            />
+            <SingleMealBlock
+                headerText={headerInfo.snackText}
+                meals={datesData.map((daySchedule) => ({
+                    mealName: daySchedule.snack.mealName,
+                    date: daySchedule.date,
+                }))}
+                setHeaderText={(newText) =>
+                    setHeaderInfo({ ...headerInfo, snackText: newText })
+                }
+            />
         </>
     );
 };
@@ -185,47 +123,6 @@ const GridOfDates = (props: gridDateProps) => {
             {...datesOfWeek.map((day) => <Cell key={day}>{day}</Cell>)}
         </Grid>
     );
-};
-
-interface elementFromLunchProps {
-    lunch: Lunch;
-}
-
-const ElementFromLunch = (props: elementFromLunchProps) => {
-    return (
-        <>
-            {props.lunch.is3Course && <>{props.lunch.mainMeal.mealName}</>}
-            {!props.lunch.is3Course && (
-                <>
-                    {props.lunch.mainMeal.mealName}
-                    {props.lunch.stirFry?.mealName}
-                    {props.lunch.soup?.mealName}
-                </>
-            )}
-        </>
-    );
-};
-
-const mockDaySchedule: FoodDaySchedule = {
-    date: new Date(),
-    breakfast: {
-        mealId: '1',
-        mealName: 'Cereal',
-        mealType: ['breakfast'],
-    },
-    lunch: {
-        is3Course: false,
-        mainMeal: {
-            mealId: '2',
-            mealName: 'Sandwich',
-            mealType: ['lunch'],
-        },
-    },
-    snack: {
-        mealId: '3',
-        mealName: 'Apple',
-        mealType: ['snack'],
-    },
 };
 
 export default WeekView;

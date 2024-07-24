@@ -6,8 +6,8 @@ export type TableHeaderInfo = {
 export type RowHeaderInfo = {
     breakfastText: string;
     lunchText: string;
-    mainMealText: string;
-    stirFryText: string;
-    soupText: string;
+    meal1Text: string;
+    meal2Text: string;
+    meal3Text: string;
     snackText: string;
 };
