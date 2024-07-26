@@ -1,5 +1,5 @@
 import { Grid } from '@mantine/core';
-import Cell from '../cells/Cell';
+import Cell from './Cell';
 import EditableString from '@/components/utilities/EditableString';
 import { memo } from 'react';
 import { isEqual } from 'lodash';
@@ -22,6 +22,7 @@ function SingleMealBlock(props: SingleMealProps) {
                 <EditableString
                     text={props.headerText}
                     onEditText={props.setHeaderText}
+                    disabled={true}
                 />
             </Cell>
             {...props.meals.map((meal) => (

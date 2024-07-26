@@ -1,12 +1,18 @@
 .paperInCell {
-  display: flex;
-  min-height: 50px;
-  width: 100px;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    min-height: 50px;
+    width: 100px;
+    justify-content: center;
+    align-items: center;
 }
 
 .gridCell {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+}
+
+.tableContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px 0px;
 }

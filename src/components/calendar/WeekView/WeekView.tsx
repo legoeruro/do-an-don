@@ -1,25 +1,34 @@
 import { Grid, GridCol, Paper, Input } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
-import SingleMealBlock from './SingleMealBlocks';
+import SingleMealBlock from './tableDisplayComponents/SingleMealBlocks';
 
-import { RowHeaderInfo } from '../../../types/CalendarComponentTypes';
-import EditableString from '../../utilities/EditableString';
-
-import Cell from '../cells/Cell';
-import { FoodDaySchedule, Lunch } from '@/types/foodSchedulingTypes';
+import Cell from './tableDisplayComponents/Cell';
 
 import { useSchedulerStoreContext } from '@/stores/useSchedulerStore';
-import { scheduler } from 'timers/promises';
-import CourseMealBlock from './CourseMealBlock';
+import CourseMealBlock from './tableDisplayComponents/CourseMealBlock';
+
+import classes from '@/components/calendar/calendarStyles.module.css';
+import { Meal, MealInDay } from '@/types/FoodSchedulingTypes';
+import PopupWindow from './popupWindow';
 
 // for large viewports
 const WeekView = () => {
-    //TODO: replace with actual data
-    const daySchedules = useSchedulerStoreContext(
-        (state) => state.foodSchedules
+    const [isEditing, setIsEditing] = useState(false);
+    interface MealInfo {
+        meal: Meal;
+        mealInDay: MealInDay;
+        day: Date;
+    }
+    const [editMealInfo, setEditMealInfo] = useState<undefined | MealInfo>(
+        undefined
     );
-    const datesData = daySchedules.map((schedule) => ({
+
+    const schedules = useSchedulerStoreContext((state) => state.foodSchedules);
+    const updateSchedules = useSchedulerStoreContext(
+        (state) => state.updateFoodSchedule
+    );
+    const datesData = schedules.map((schedule) => ({
         ...schedule,
         date: new Date(new Date().setHours(0, 0, 0, 0)),
     }));
@@ -35,52 +44,85 @@ const WeekView = () => {
         startingWeekDate.getDate() + 7 * 24 * 60 * 60 * 1000
     );
 
+    const updateSingleMeal = (
+        meal: Meal | undefined,
+        mealInDay: MealInDay | undefined,
+        date: Date | undefined
+    ) => {
+        if (!meal || !mealInDay || !date) return;
+        //TODO: update in database
+        const index = schedules.findIndex(
+            (e) => e.date.getDate() === date.getDate()
+        );
+        updateSchedules(index, {
+            ...schedules[index],
+            [mealInDay]: meal,
+        });
+
+        setIsEditing(false);
+        setEditMealInfo(undefined);
+    };
+
     return (
         <>
-            <div>
-                <h1>Week View</h1>
-                test
-            </div>
-            <ColTitle
-                startingDate={startingWeekDate}
-                endingDate={endingWeekDate}
-            />
-            <GridOfDates isBeginningSpaced={true} />
+            <h1>Week View</h1>
+            <div
+                key="WeekviewTableContainer"
+                className={classes.tableContainer}
+            >
+                <ColTitle
+                    startingDate={startingWeekDate}
+                    endingDate={endingWeekDate}
+                />
+                <GridOfDates isBeginningSpaced={true} />
 
-            <SingleMealBlock
-                headerText={headerInfo.breakfastText}
-                meals={datesData.map((daySchedule) => ({
-                    mealName: daySchedule.breakfast.mealName,
-                    date: daySchedule.date,
-                }))}
-                setHeaderText={(newText) =>
-                    setHeaderInfo({ ...headerInfo, breakfastText: newText })
-                }
-            />
-            <CourseMealBlock
-                headerText={headerInfo.lunchText}
-                meal1Text={headerInfo.meal1Text}
-                meal2Text={headerInfo.meal2Text}
-                meal3Text={headerInfo.meal3Text}
-                meals={datesData.map((daySchedule) => ({
-                    lunch: daySchedule.lunch,
-                    date: daySchedule.date,
-                }))}
-                setHeaderText={(newText) =>
-                    setHeaderInfo({
-                        ...headerInfo,
-                        ...newText,
-                    })
-                }
-            />
-            <SingleMealBlock
-                headerText={headerInfo.snackText}
-                meals={datesData.map((daySchedule) => ({
-                    mealName: daySchedule.snack.mealName,
-                    date: daySchedule.date,
-                }))}
-                setHeaderText={(newText) =>
-                    setHeaderInfo({ ...headerInfo, snackText: newText })
+                <SingleMealBlock
+                    headerText={headerInfo.breakfastText}
+                    meals={datesData.map((daySchedule) => ({
+                        mealName: daySchedule.breakfast.mealName,
+                        date: daySchedule.date,
+                    }))}
+                    setHeaderText={(newText) =>
+                        setHeaderInfo({ ...headerInfo, breakfastText: newText })
+                    }
+                />
+                <CourseMealBlock
+                    headerText={headerInfo.lunchText}
+                    meal1Text={headerInfo.meal1Text}
+                    meal2Text={headerInfo.meal2Text}
+                    meal3Text={headerInfo.meal3Text}
+                    meals={datesData.map((daySchedule) => ({
+                        lunch: daySchedule.lunch,
+                        date: daySchedule.date,
+                    }))}
+                    setHeaderText={(newText) =>
+                        setHeaderInfo({
+                            ...headerInfo,
+                            ...newText,
+                        })
+                    }
+                />
+                <SingleMealBlock
+                    headerText={headerInfo.snackText}
+                    meals={datesData.map((daySchedule) => ({
+                        mealName: daySchedule.snack.mealName,
+                        date: daySchedule.date,
+                    }))}
+                    setHeaderText={(newText) =>
+                        setHeaderInfo({ ...headerInfo, snackText: newText })
+                    }
+                />
+            </div>
+            <PopupWindow
+                isOpen={isEditing}
+                meal={editMealInfo?.meal}
+                onClose={() => setIsEditing(false)}
+                onConfirmEdit={(meal) =>
+                    updateSingleMeal(
+                        meal,
+                        editMealInfo?.mealInDay,
+                        editMealInfo?.day
+                    )
                 }
             />
         </>
@@ -95,7 +137,13 @@ const ColTitle = ({
     endingDate: Date;
 }) => {
     return (
-        <Paper shadow="xs">
+        <Paper
+            shadow="xs"
+            style={{
+                padding: '0.5rem',
+                margin: '0.8rem',
+            }}
+        >
             Schedule from {startingDate.toLocaleDateString('vi-VN')} to{' '}
             {endingDate.toLocaleDateString('vi-VN')}
         </Paper>
@@ -116,7 +164,7 @@ const datesOfWeek = [
 interface gridDateProps {
     isBeginningSpaced: boolean;
 }
-const GridOfDates = (props: gridDateProps) => {
+const GridOfDatesUnpure = (props: gridDateProps) => {
     return (
         <Grid columns={8}>
             {props.isBeginningSpaced && <GridCol span={1}></GridCol>}
@@ -124,5 +172,7 @@ const GridOfDates = (props: gridDateProps) => {
         </Grid>
     );
 };
+
+const GridOfDates = memo(GridOfDatesUnpure);
 
 export default WeekView;

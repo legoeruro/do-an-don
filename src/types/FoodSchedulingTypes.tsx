@@ -5,10 +5,12 @@ export type FoodDaySchedule = {
     snack: Meal;
 };
 
+export type MealInDay = 'breakfast' | 'lunch' | 'snack';
+
 export type Meal = {
     mealId: string;
     mealName: string;
-    mealType: string[];
+    mealType: MealTypes;
 };
 
 // mirror database setup
@@ -18,3 +20,14 @@ export type Lunch = {
     meal2?: Meal;
     meal3?: Meal;
 };
+
+export const mealTypeOptions = [
+    'drink',
+    'side',
+    'main',
+    'breakfast',
+    'stirFry',
+    'soup',
+    'snack',
+];
+export type MealTypes = (typeof mealTypeOptions)[number];

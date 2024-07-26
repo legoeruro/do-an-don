@@ -1,9 +1,9 @@
 import { Grid, Paper } from '@mantine/core';
-import Cell from '../cells/Cell';
+import Cell from './Cell';
 import EditableString from '@/components/utilities/EditableString';
 import { memo } from 'react';
 import { isEqual } from 'lodash';
-import { Lunch, Meal } from '@/types/foodSchedulingTypes';
+import { Lunch, Meal } from '@/types/FoodSchedulingTypes';
 
 interface CourseMealProps {
     headerText: string;
@@ -19,6 +19,7 @@ interface CourseMealProps {
 
 function CourseMealBlock(props: CourseMealProps) {
     //TODO: add editing features
+    //TODO: replace disabled with editing feature (and make sure it doesn't lag)
     return (
         <Grid columns={8}>
             <Cell>
@@ -32,6 +33,7 @@ function CourseMealBlock(props: CourseMealProps) {
                                         lunchText: newText,
                                     })
                                 }
+                                disabled={true}
                             />
                         </Paper>
                     </Grid.Col>
@@ -44,6 +46,7 @@ function CourseMealBlock(props: CourseMealProps) {
                                         meal1Text: newText,
                                     })
                                 }
+                                disabled={true}
                             />
                         </Paper>
                         <Paper shadow="xs">
@@ -54,6 +57,7 @@ function CourseMealBlock(props: CourseMealProps) {
                                         meal2Text: newText,
                                     })
                                 }
+                                disabled={true}
                             />
                         </Paper>
                         <Paper shadow="xs">
@@ -64,6 +68,7 @@ function CourseMealBlock(props: CourseMealProps) {
                                         meal3Text: newText,
                                     })
                                 }
+                                disabled={true}
                             />
                         </Paper>
                     </Grid.Col>

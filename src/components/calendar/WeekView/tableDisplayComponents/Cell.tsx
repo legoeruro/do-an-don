@@ -1,6 +1,5 @@
 import { Grid, Paper } from '@mantine/core';
 import classes from '../calendarStyles.module.css';
-import EditableString from '../../utilities/EditableString';
 import React, { memo } from 'react';
 
 interface CellsProps {
