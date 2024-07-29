@@ -1,29 +1,47 @@
 import { FoodDaySchedule } from '@/types/FoodSchedulingTypes';
 import { IScheduleSliceProps } from '../scheduleSlice';
+import { RowHeader, RowHeaderInfo } from '@/types/CalendarComponentTypes';
 
-const mockScheduleArray = Array.from({ length: 7 }, () => mockDaySchedule);
-
-const mockDaySchedule: FoodDaySchedule = {
-    date: new Date(),
-    breakfast: {
+const breakfastMeals = [
+    {
         mealId: '1',
         mealName: 'Cereal',
-        mealType: 'breakfast',
+        mealType: ['breakfast'],
     },
-    lunch: {
-        is3Course: false,
-        meal1: {
-            mealId: '2',
-            mealName: 'Sandwich',
-            mealType: 'lunch',
-        },
+];
+
+const lunchMeals = [
+    {
+        mealId: '2',
+        mealName: 'Sandwich',
+        mealType: ['lunch'],
     },
-    snack: {
+];
+
+const snackMeals = [
+    {
         mealId: '3',
         mealName: 'Apple',
-        mealType: 'snack',
+        mealType: ['snack'],
     },
+];
+
+const mockDaySchedule: FoodDaySchedule = {
+    date: new Date(new Date().setHours(0, 0, 0, 0)),
+    mealInDays: new Map([
+        ['breakfast', breakfastMeals],
+        ['lunch', lunchMeals],
+        ['snack', snackMeals],
+    ]),
+    mealInDaysOrder: ['breakfast', 'lunch', 'snack'],
 };
+
+const mockScheduleArray = Array.from({ length: 7 }, (_, index) => ({
+    ...mockDaySchedule,
+    date: new Date(
+        mockDaySchedule.date.getDate() + index * 24 * 60 * 60 * 1000
+    ),
+}));
 
 export const scheduleSliceDefault: IScheduleSliceProps = {
     startingWeekDate: new Date(),
@@ -32,12 +50,34 @@ export const scheduleSliceDefault: IScheduleSliceProps = {
         toText: 'To',
     },
     rowHeaderInfo: {
-        breakfastText: 'Breakfast',
-        lunchText: 'Lunch',
-        meal1Text: 'Main Meal',
-        meal2Text: 'Stir Fry',
-        meal3Text: 'Soup',
-        snackText: 'Snack',
+        map: new Map([
+            [
+                'breakfast',
+                {
+                    headerText: 'Breakfast',
+                    subHeaderText: [],
+                },
+            ],
+            [
+                'lunch',
+                {
+                    headerText: 'Lunch',
+                    subHeaderText: ['Main Meal', 'Stir Fry', 'Soup'],
+                },
+            ],
+            [
+                'snack',
+                {
+                    headerText: 'Snack',
+                    subHeaderText: [],
+                },
+            ],
+        ]),
     },
     foodSchedules: mockScheduleArray,
+};
+
+export const defaultRowHeader: RowHeader = {
+    headerText: 'undefined',
+    subHeaderText: [],
 };

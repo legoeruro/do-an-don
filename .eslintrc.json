@@ -1,18 +1,13 @@
 {
-  "root": true,
-  "extends": [
-    "next/core-web-vitals"
-  ],
-  "rules":{
-    "no-warning-comments": [
-    1,
-    {
-      "location": "anywhere",
-      "terms": [
-        "TODO",
-        "FIXME"
-      ]
+    "root": true,
+    "extends": ["next/core-web-vitals"],
+    "rules": {
+        "no-warning-comments": [
+            1,
+            {
+                "location": "anywhere",
+                "terms": ["TODO", "FIXME", "FEATURE"]
+            }
+        ]
     }
-  ]
-  }
 }

@@ -1,26 +1,20 @@
 export type FoodDaySchedule = {
     date: Date;
-    breakfast: Meal;
-    lunch: Lunch;
-    snack: Meal;
+    mealInDays: Map<MealInDayOptions, Meal[]>;
+    mealInDaysOrder: MealInDayOptions[];
 };
 
-export type MealInDay = 'breakfast' | 'lunch' | 'snack';
+export const exampleMealInDayOptions = ['breakfast', 'lunch', 'snack'];
+//User-defined
+export type MealInDayOptions = String;
 
 export type Meal = {
     mealId: string;
     mealName: string;
-    mealType: MealTypes;
+    mealType: MealTypes[];
 };
 
-// mirror database setup
-export type Lunch = {
-    is3Course: boolean;
-    meal1: Meal;
-    meal2?: Meal;
-    meal3?: Meal;
-};
-
+//TODO: Change this to user-defined (string)
 export const mealTypeOptions = [
     'drink',
     'side',
@@ -31,3 +25,9 @@ export const mealTypeOptions = [
     'snack',
 ];
 export type MealTypes = (typeof mealTypeOptions)[number];
+
+export const placeholderMeal: Meal = {
+    mealId: '-1',
+    mealName: 'undefined',
+    mealType: [mealTypeOptions[0]],
+};

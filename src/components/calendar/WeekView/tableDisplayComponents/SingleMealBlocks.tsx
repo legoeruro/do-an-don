@@ -1,15 +1,18 @@
-import { Grid } from '@mantine/core';
+import { Grid, UnstyledButton } from '@mantine/core';
 import Cell from './Cell';
 import EditableString from '@/components/utilities/EditableString';
 import { memo } from 'react';
 import { isEqual } from 'lodash';
+import { Meal, MealInDayOptions } from '@/types/FoodSchedulingTypes';
+import TextOnlyCell from './TextOnlyCell';
 
 interface SingleMealProps {
     headerText: string;
     meals: {
-        mealName: string;
+        meal: Meal;
         date: Date;
     }[];
+    onMealPress: (meal: Meal, date: Date) => void;
     setHeaderText: (newText: string) => void;
 }
 
@@ -25,8 +28,24 @@ function SingleMealBlock(props: SingleMealProps) {
                     disabled={true}
                 />
             </Cell>
-            {...props.meals.map((meal) => (
-                <Cell key={meal.date.toString()}>{meal.mealName}</Cell>
+            {...props.meals.map((mealElement) => (
+                <Cell key={mealElement.date.toString()}>
+                    <UnstyledButton
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            textAlign: 'center',
+                        }}
+                        onClick={() =>
+                            props.onMealPress(
+                                mealElement.meal,
+                                mealElement.date
+                            )
+                        }
+                    >
+                        {mealElement?.meal?.mealName}
+                    </UnstyledButton>
+                </Cell>
             ))}
         </Grid>
     );

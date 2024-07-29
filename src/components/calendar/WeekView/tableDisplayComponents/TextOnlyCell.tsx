@@ -3,19 +3,19 @@ import { Grid, Paper } from '@mantine/core';
 import classes from '@/components/calendar/calendarStyles.module.css';
 import React, { memo } from 'react';
 
-interface CellsProps {
-    children?: React.ReactNode;
+interface TextOnlyCellsProps {
+    text?: string;
     key?: string;
 }
 
-function Cell(props: CellsProps) {
+function TextOnlyCell(props: TextOnlyCellsProps) {
     return (
         <Grid.Col span={1} className={classes.gridCell}>
             <Paper shadow="xs" className={classes.paperInCell}>
-                {props.children}
+                {props.text}
             </Paper>
         </Grid.Col>
     );
 }
 
-export default memo(Cell);
+export default memo(TextOnlyCell);

@@ -1,4 +1,5 @@
-import { Grid, GridCol, Paper, Input } from '@mantine/core';
+'use client';
+import { Grid, GridCol, Paper, Input, UnstyledButton } from '@mantine/core';
 import { memo, useEffect, useState } from 'react';
 
 import SingleMealBlock from './tableDisplayComponents/SingleMealBlocks';
@@ -9,29 +10,37 @@ import { useSchedulerStoreContext } from '@/stores/useSchedulerStore';
 import CourseMealBlock from './tableDisplayComponents/CourseMealBlock';
 
 import classes from '@/components/calendar/calendarStyles.module.css';
-import { Meal, MealInDay } from '@/types/FoodSchedulingTypes';
-import PopupWindow from './popupWindow';
+import {
+    Meal,
+    MealInDayOptions,
+    exampleMealInDayOptions,
+    placeholderMeal,
+} from '@/types/FoodSchedulingTypes';
+import PopupWindow from './popupWindow/PopupWindow';
+import { defaultRowHeader } from '@/stores/defaultValues/scheduleSliceDefault';
+
+export interface MealInDayInfo {
+    meals: Meal[];
+    mealInDay: MealInDayOptions;
+    date: Date;
+}
+const defaultMealInfo: MealInDayInfo = {
+    meals: [placeholderMeal],
+    mealInDay: exampleMealInDayOptions[0],
+    date: new Date(),
+};
 
 // for large viewports
 const WeekView = () => {
     const [isEditing, setIsEditing] = useState(false);
-    interface MealInfo {
-        meal: Meal;
-        mealInDay: MealInDay;
-        day: Date;
-    }
-    const [editMealInfo, setEditMealInfo] = useState<undefined | MealInfo>(
-        undefined
-    );
+
+    const [editMealInfo, setEditMealInfo] =
+        useState<MealInDayInfo>(defaultMealInfo);
 
     const schedules = useSchedulerStoreContext((state) => state.foodSchedules);
     const updateSchedules = useSchedulerStoreContext(
         (state) => state.updateFoodSchedule
     );
-    const datesData = schedules.map((schedule) => ({
-        ...schedule,
-        date: new Date(new Date().setHours(0, 0, 0, 0)),
-    }));
 
     const headerInfo = useSchedulerStoreContext((state) => state.rowHeaderInfo);
     const setHeaderInfo = useSchedulerStoreContext(
@@ -44,24 +53,30 @@ const WeekView = () => {
         startingWeekDate.getDate() + 7 * 24 * 60 * 60 * 1000
     );
 
-    const updateSingleMeal = (
-        meal: Meal | undefined,
-        mealInDay: MealInDay | undefined,
-        date: Date | undefined
-    ) => {
-        if (!meal || !mealInDay || !date) return;
+    const onEditMeal = (mealInfo: MealInDayInfo) => {
+        setEditMealInfo(mealInfo);
+        setIsEditing(true);
+        console.log(editMealInfo);
+    };
+
+    const updateMealInDay = (mealInDayInfo: MealInDayInfo) => {
+        console.log(mealInDayInfo);
+        // if (!mealInfo.meal || !mealInfo.mealInDay || !mealInfo.date) return;
         //TODO: update in database
-        const index = schedules.findIndex(
-            (e) => e.date.getDate() === date.getDate()
+        updateSchedules(
+            mealInDayInfo.date,
+            mealInDayInfo.mealInDay,
+            mealInDayInfo.meals
         );
-        updateSchedules(index, {
-            ...schedules[index],
-            [mealInDay]: meal,
-        });
 
         setIsEditing(false);
-        setEditMealInfo(undefined);
+        setEditMealInfo(defaultMealInfo);
     };
+
+    const meal1 = 'breakfast';
+    const meal2 = 'lunch';
+    const meal2Headers = headerInfo.map.get(meal2);
+    const meal3 = 'snack';
 
     return (
         <>
@@ -77,53 +92,69 @@ const WeekView = () => {
                 <GridOfDates isBeginningSpaced={true} />
 
                 <SingleMealBlock
-                    headerText={headerInfo.breakfastText}
-                    meals={datesData.map((daySchedule) => ({
-                        mealName: daySchedule.breakfast.mealName,
+                    headerText={headerInfo.map.get(meal1)?.headerText ?? ''}
+                    meals={schedules.map((daySchedule) => ({
+                        meal:
+                            daySchedule.mealInDays.get(meal1)?.[0] ??
+                            placeholderMeal,
                         date: daySchedule.date,
                     }))}
                     setHeaderText={(newText) =>
-                        setHeaderInfo({ ...headerInfo, breakfastText: newText })
+                        setHeaderInfo(meal1, {
+                            ...(headerInfo.map.get(meal1) ?? defaultRowHeader),
+                            headerText: newText,
+                        })
                     }
-                />
-                <CourseMealBlock
-                    headerText={headerInfo.lunchText}
-                    meal1Text={headerInfo.meal1Text}
-                    meal2Text={headerInfo.meal2Text}
-                    meal3Text={headerInfo.meal3Text}
-                    meals={datesData.map((daySchedule) => ({
-                        lunch: daySchedule.lunch,
-                        date: daySchedule.date,
-                    }))}
-                    setHeaderText={(newText) =>
-                        setHeaderInfo({
-                            ...headerInfo,
-                            ...newText,
+                    onMealPress={(meal, date) =>
+                        onEditMeal({
+                            meals: [meal],
+                            date: date,
+                            mealInDay: 'breakfast',
                         })
                     }
                 />
-                <SingleMealBlock
+                <CourseMealBlock
+                    headers={meal2Headers ?? defaultRowHeader}
+                    mealsEachDate={schedules.map((daySchedule) => ({
+                        meals: daySchedule.mealInDays.get(meal2) ?? [
+                            placeholderMeal,
+                        ],
+                        date: daySchedule.date,
+                    }))}
+                    setHeaderText={(newHeader) =>
+                        setHeaderInfo(meal2, {
+                            ...headerInfo,
+                            ...newHeader,
+                        })
+                    }
+                />
+                {/* <SingleMealBlock
                     headerText={headerInfo.snackText}
-                    meals={datesData.map((daySchedule) => ({
-                        mealName: daySchedule.snack.mealName,
+                    meals={schedules.map((daySchedule) => ({
+                        meal: daySchedule.snack,
                         date: daySchedule.date,
                     }))}
                     setHeaderText={(newText) =>
                         setHeaderInfo({ ...headerInfo, snackText: newText })
                     }
-                />
+                    onMealPress={(meal, date) =>
+                        onEditMeal({ meal, date: date, mealInDay: 'snack' })
+                    }
+                /> */}
             </div>
             <PopupWindow
                 isOpen={isEditing}
-                meal={editMealInfo?.meal}
+                meals={editMealInfo?.meals}
                 onClose={() => setIsEditing(false)}
-                onConfirmEdit={(meal) =>
-                    updateSingleMeal(
-                        meal,
-                        editMealInfo?.mealInDay,
-                        editMealInfo?.day
-                    )
-                }
+                onConfirmEdit={(meals) => {
+                    if (!meals) return;
+                    console.log(editMealInfo);
+                    updateMealInDay({
+                        meals: meals,
+                        mealInDay: editMealInfo?.mealInDay,
+                        date: editMealInfo?.date,
+                    });
+                }}
             />
         </>
     );

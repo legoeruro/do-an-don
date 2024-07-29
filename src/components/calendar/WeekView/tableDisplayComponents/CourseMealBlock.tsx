@@ -3,18 +3,17 @@ import Cell from './Cell';
 import EditableString from '@/components/utilities/EditableString';
 import { memo } from 'react';
 import { isEqual } from 'lodash';
-import { Lunch, Meal } from '@/types/FoodSchedulingTypes';
+import { Meal } from '@/types/FoodSchedulingTypes';
+import { RowHeader } from '@/types/CalendarComponentTypes';
+import { headers } from 'next/headers';
 
 interface CourseMealProps {
-    headerText: string;
-    meal1Text: string;
-    meal2Text: string;
-    meal3Text: string;
-    meals: {
-        lunch: Lunch;
+    headers: RowHeader;
+    mealsEachDate: {
+        meals: Meal[];
         date: Date;
     }[];
-    setHeaderText: (newText: {}) => void;
+    setHeaderText: (newHeaders: RowHeader) => void;
 }
 
 function CourseMealBlock(props: CourseMealProps) {
@@ -27,10 +26,11 @@ function CourseMealBlock(props: CourseMealProps) {
                     <Grid.Col span={1}>
                         <Paper shadow="xs">
                             <EditableString
-                                text={props.headerText}
+                                text={props.headers.headerText}
                                 onEditText={(newText) =>
                                     props.setHeaderText({
-                                        lunchText: newText,
+                                        ...props.headers,
+                                        headerText: newText,
                                     })
                                 }
                                 disabled={true}
@@ -38,62 +38,47 @@ function CourseMealBlock(props: CourseMealProps) {
                         </Paper>
                     </Grid.Col>
                     <Grid.Col span={1}>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={props.meal1Text}
-                                onEditText={(newText) =>
-                                    props.setHeaderText({
-                                        meal1Text: newText,
-                                    })
-                                }
-                                disabled={true}
-                            />
-                        </Paper>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={props.meal2Text}
-                                onEditText={(newText) =>
-                                    props.setHeaderText({
-                                        meal2Text: newText,
-                                    })
-                                }
-                                disabled={true}
-                            />
-                        </Paper>
-                        <Paper shadow="xs">
-                            <EditableString
-                                text={props.meal3Text}
-                                onEditText={(newText) =>
-                                    props.setHeaderText({
-                                        meal3Text: newText,
-                                    })
-                                }
-                                disabled={true}
-                            />
-                        </Paper>
+                        {props.headers.subHeaderText.map((mealTexts, index) => (
+                            <Paper key="index" shadow="xs">
+                                <EditableString
+                                    text={mealTexts}
+                                    onEditText={(newText) =>
+                                        props.setHeaderText({
+                                            ...props.headers,
+                                            subHeaderText:
+                                                props.headers.subHeaderText.with(
+                                                    index,
+                                                    newText
+                                                ),
+                                        })
+                                    }
+                                    disabled={true}
+                                />
+                            </Paper>
+                        ))}
                     </Grid.Col>
                 </Grid>
             </Cell>
-            {...props.meals.map((daySchedule) => (
+            {...props.mealsEachDate.map((daySchedule) => (
                 <Cell key={daySchedule.date.toString()}>
-                    <ElementFromLunch lunch={daySchedule.lunch} />
+                    <MultipleMeals lunch={daySchedule.meals} />
                 </Cell>
             ))}
         </Grid>
     );
 }
 
-const ElementFromLunch = ({ lunch }: { lunch: Lunch }) => {
+const MultipleMeals = ({ lunch }: { lunch: Meal[] }) => {
     return (
         <>
-            {!lunch.is3Course && <>{lunch.meal1.mealName}</>}
+            {/* {!lunch.is3Course && <>{lunch.meal1.mealName}</>}
             {lunch.is3Course && (
                 <>
                     {lunch.meal1.mealName}
                     {lunch.meal2?.mealName}
                     {lunch.meal3?.mealName}
                 </>
-            )}
+            )} */}
         </>
     );
 };
