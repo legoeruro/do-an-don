@@ -11,7 +11,7 @@ interface CellsProps {
 function Cell(props: CellsProps) {
     return (
         <Grid.Col span={1} className={classes.gridCell}>
-            <Paper shadow="xs" className={classes.paperInCell}>
+            <Paper shadow="xs" className={classes.paperInCellWithMinSize}>
                 {props.children}
             </Paper>
         </Grid.Col>

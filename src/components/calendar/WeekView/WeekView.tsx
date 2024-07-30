@@ -127,6 +127,13 @@ const WeekView = () => {
                             ...newHeader,
                         })
                     }
+                    onMealPress={(meals, date) =>
+                        onEditMeal({
+                            meals: meals,
+                            date: date,
+                            mealInDay: meal2,
+                        })
+                    }
                 />
                 {/* <SingleMealBlock
                     headerText={headerInfo.snackText}

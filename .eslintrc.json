@@ -6,7 +6,7 @@
             1,
             {
                 "location": "anywhere",
-                "terms": ["TODO", "FIXME", "FEATURE"]
+                "terms": ["TODO", "FIXME", "FEATURE", "MAKESURE"]
             }
         ]
     }

@@ -16,6 +16,16 @@ const lunchMeals = [
         mealName: 'Sandwich',
         mealType: ['lunch'],
     },
+    {
+        mealId: '2',
+        mealName: 'Sandwich',
+        mealType: ['lunch'],
+    },
+    {
+        mealId: '2',
+        mealName: 'Sandwich',
+        mealType: ['lunch'],
+    },
 ];
 
 const snackMeals = [

@@ -8,29 +8,36 @@ import {
 import { fetchMealList } from '@/utils/fetch';
 import { Button, Modal, Paper, Select, TextInput } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import MealItemCard from './MealItemCard';
+import { mealListToMap } from '@/utils/arrays';
+
+import { isEqual } from 'lodash';
 
 interface IPopupWindowProps {
     isOpen: boolean;
     meals?: Meal[];
     onClose: () => void;
-    onConfirmEdit: (meal: Meal[] | undefined) => void;
+    onConfirmEdit: (meal: Meal[]) => void;
 }
 export default function PopupWindow(props: IPopupWindowProps) {
-    const [editedMeals, setEditedMeals] = useState<Partial<Meal[]>>(
+    const [editedMeals, setEditedMeals] = useState<Meal[]>(
         props.meals ? props.meals : [placeholderMeal]
     );
-
-    const [mealType, setMealType] = useState<MealTypes | undefined>(undefined);
 
     useEffect(() => {
         if (props.meals) setEditedMeals(props.meals);
     }, [props.meals]);
 
-    const [mealList, setMealList] = useState<Meal[]>([]);
+    const [defaultMealListMap, setDefaultMealListMap] =
+        useState<Map<string, Meal>>();
 
     useEffect(() => {
-        fetchMealList(mealType).then((data) => setMealList(data));
-    }, [mealType]);
+        fetchMealList().then((data) =>
+            setDefaultMealListMap(mealListToMap(data))
+        );
+    }, []);
+
+    //TODO: add new button
 
     return (
         <Modal
@@ -39,24 +46,44 @@ export default function PopupWindow(props: IPopupWindowProps) {
             title="Meal Details"
             size="md"
         >
-            <Paper shadow="xs">
-                <Button />
-            </Paper>
+            {editedMeals.map((meal, index) => (
+                <MealItemCard
+                    key={index.toString()}
+                    meal={meal}
+                    defaultMealListMap={defaultMealListMap}
+                    onDelete={() =>
+                        setEditedMeals(editedMeals.splice(index, 1))
+                    }
+                    onChangeMeal={(newMeal) => {
+                        if (newMeal) {
+                            setEditedMeals(editedMeals.with(index, newMeal));
+                        }
+                    }}
+                />
+            ))}
 
-            <button
-                onClick={() => props.onConfirmEdit(validateObject(editedMeal))}
+            <Button
+                onClick={() => {
+                    validateObject(editedMeals) &&
+                        props.onConfirmEdit(editedMeals);
+                }}
             >
                 Edit
-            </button>
+            </Button>
             {/* <button onClick={() => props.onDeleteMeal()}>Delete</button> */}
         </Modal>
     );
 }
 
-function validateObject(obj: Partial<Meal>): Meal | undefined {
+function validateObject(obj: Meal[]): boolean {
+    //MAKESURE this works
     console.log(Object.values(obj));
-    if (Object.values(obj).every((item) => item)) {
-        return obj as Meal;
+    if (
+        Object.values(obj).every(
+            (foodItem) => !isEqual(foodItem, placeholderMeal)
+        )
+    ) {
+        return true;
     }
     // if (obj.mealId && obj.mealName && obj.mealType)
     //     return {
@@ -64,5 +91,5 @@ function validateObject(obj: Partial<Meal>): Meal | undefined {
     //         mealName: obj.mealName,
     //         mealType: obj.mealType,
     //     };
-    return undefined;
+    return false;
 }

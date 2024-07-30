@@ -1,39 +1,42 @@
 'use client';
 
 import { Meal, mealTypeOptions, MealTypes } from '@/types/FoodSchedulingTypes';
-import { Button, Paper, Select } from '@mantine/core';
-import classes from '@/components/calendar/WeekView/popupWindow/cardStyles.module.css';
+import { UnstyledButton, Paper, Select, Button } from '@mantine/core';
+import classes from '@/components/calendar/calendarStyles.module.css';
 import { propagateServerField } from 'next/dist/server/lib/render-server';
 import { useEffect, useState } from 'react';
 import { fetchMealList } from '@/utils/fetch';
 import { isEqual } from 'lodash';
+import { mealListToMap } from '@/utils/arrays';
 
 interface IMealItemCardProps {
+    key: string;
     meal: Meal;
-    defaultMealList: Meal[];
-    selectedType: MealTypes;
+    defaultMealListMap: Map<string, Meal> | undefined;
     onDelete: () => void;
     onChangeMeal: (meal: Meal | undefined) => void;
 }
 
 export default function MealItemCard(props: IMealItemCardProps) {
     const [mealType, setMealType] = useState<MealTypes | undefined>(undefined);
-    const [lastMealType, setLastMealType] = useState<MealTypes | undefined>(
-        undefined
-    );
 
-    const [mealList, setMealList] = useState<Meal[]>();
+    //for displaying loading skeleton when mealList is being fetched
+    const [mealListMealType, setMealListMealType] = useState<
+        MealTypes | undefined
+    >(undefined);
+
+    const [mealListMap, setMealListMap] = useState<Map<string, Meal>>();
+    const mealList = Array.from(mealListMap ?? [], ([_name, value]) => value);
+
     useEffect(() => {
-        setMealList(props.defaultMealList);
-    }, [props.defaultMealList]);
-    const setMealListWithMealType = (mealType: MealTypes) => {
-        setMealType(undefined);
-        fetchMealList(mealType).then((data) => setMealList(data));
+        setMealListMap(props.defaultMealListMap);
+    }, [props.defaultMealListMap]);
+    const setMealListMapWithMealType = async (mealType: MealTypes) => {
+        fetchMealList(mealType).then((data) => {
+            setMealListMap(mealListToMap(data));
+            setMealListMealType(mealType);
+        });
     };
-
-    //FEATURE: set mealIndex in a better way to be less laggy
-    const mealIndex = mealList?.find((meal) => isEqual(meal, props.meal));
-    // const [mealIndex, setMealIndex] = useState<number | undefined>(undefined);
 
     return (
         <Paper className={classes.card}>
@@ -44,41 +47,45 @@ export default function MealItemCard(props: IMealItemCardProps) {
                     justifyContent: 'flex-end',
                 }}
             >
-                <Button onClick={() => props.onDelete()}>x</Button>
+                <Button onClick={() => props.onDelete()}>X</Button>
             </div>
-            <Select
-                label="Meal Type"
-                placeholder="Select a meal type"
-                data={mealTypeOptions}
-                value={mealType}
-                onChange={(value) => {
-                    setMealType(value ?? undefined);
-                    if (mealType && !props.meal.mealType.includes(mealType)) {
-                        setMealListWithMealType(mealType);
-                        props.onChangeMeal(undefined);
+            <div>
+                <Select
+                    label="Meal Type"
+                    placeholder="Select a meal type"
+                    data={mealTypeOptions}
+                    value={mealType}
+                    onChange={(value) => {
+                        setMealType(value ?? undefined);
+                        console.log(value);
+                        console.log(mealType);
+                        if (value && !props.meal.mealType?.includes(value)) {
+                            setMealListMapWithMealType(value);
+                            props.onChangeMeal(undefined);
+                        }
+                    }}
+                    clearable
+                    searchable
+                />
+                <Select
+                    label="Meal Name"
+                    placeholder="Select or search a meal"
+                    data={
+                        mealList?.map((meal) => ({
+                            value: meal.mealId,
+                            label: meal.mealName,
+                        })) ?? []
                     }
-                }}
-                clearable
-                searchable
-            />
-            <Select
-                label="Meal Name"
-                placeholder="Select or search a meal"
-                data={
-                    mealList?.map((meal, index) => ({
-                        value: index.toString(),
-                        label: meal.mealName,
-                    })) ?? []
-                }
-                value={mealIndex?.toString()}
-                onChange={(value) => {
-                    const meal = mealList?.[parseInt(value ?? '0', 10)];
-                    props.onChangeMeal(meal);
-                }}
-                clearable
-                searchable
-                required
-            />
+                    value={props.meal.mealId}
+                    onChange={(value) => {
+                        const meal = mealListMap?.get(value ?? '');
+                        props.onChangeMeal(meal);
+                    }}
+                    clearable
+                    searchable
+                    required
+                />
+            </div>
         </Paper>
     );
 }
