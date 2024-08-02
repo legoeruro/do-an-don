@@ -1,38 +1,38 @@
-import { FoodDaySchedule } from '@/types/FoodSchedulingTypes';
+import { Dish, FoodDaySchedule } from '@/types/FoodSchedulingTypes';
 import { IScheduleSliceProps } from '../scheduleSlice';
 import { RowHeader, RowHeaderInfo } from '@/types/CalendarComponentTypes';
 
 const breakfastMeals = [
     {
-        mealId: '1',
-        mealName: 'Cereal',
-        mealType: ['breakfast'],
+        dishId: '1',
+        dishName: 'Cereal',
+        dishType: ['breakfast'],
     },
 ];
 
 const lunchMeals = [
     {
-        mealId: '2',
-        mealName: 'Sandwich',
-        mealType: ['lunch'],
+        dishId: '2',
+        dishName: 'Sandwich',
+        dishType: ['lunch'],
     },
     {
-        mealId: '2',
-        mealName: 'Sandwich',
-        mealType: ['lunch'],
+        dishId: '2',
+        dishName: 'Sandwich',
+        dishType: ['lunch'],
     },
     {
-        mealId: '2',
-        mealName: 'Sandwich',
-        mealType: ['lunch'],
+        dishId: '2',
+        dishName: 'Sandwich',
+        dishType: ['lunch'],
     },
 ];
 
 const snackMeals = [
     {
-        mealId: '3',
-        mealName: 'Apple',
-        mealType: ['snack'],
+        dishId: '3',
+        dishName: 'Apple',
+        dishType: ['snack'],
     },
 ];
 
@@ -86,6 +86,44 @@ export const scheduleSliceDefault: IScheduleSliceProps = {
     },
     foodSchedules: mockScheduleArray,
 };
+
+export const mockMealList: Dish[] = [
+    {
+        dishId: '1',
+        dishName: 'Cereal',
+        dishType: ['breakfast', 'snack'],
+    },
+    {
+        dishId: '2',
+        dishName: 'Sandwich',
+        dishType: ['main', 'breakfast'],
+    },
+    {
+        dishId: '3',
+        dishName: 'Apple',
+        dishType: ['snack'],
+    },
+    {
+        dishId: '4',
+        dishName: 'Spaghetti',
+        dishType: ['main'],
+    },
+    {
+        dishId: '5',
+        dishName: 'Fries',
+        dishType: ['side'],
+    },
+    {
+        dishId: '6',
+        dishName: 'Pear',
+        dishType: ['snack'],
+    },
+    {
+        dishId: '7',
+        dishName: 'Special multi-course meal with many discourses',
+        dishType: ['snack'],
+    },
+];
 
 export const defaultRowHeader: RowHeader = {
     headerText: 'undefined',

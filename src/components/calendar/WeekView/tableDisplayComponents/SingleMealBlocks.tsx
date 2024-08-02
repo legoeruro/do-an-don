@@ -3,16 +3,16 @@ import Cell from './Cell';
 import EditableString from '@/components/utilities/EditableString';
 import { memo } from 'react';
 import { isEqual } from 'lodash';
-import { Meal, MealInDayOptions } from '@/types/FoodSchedulingTypes';
+import { Dish, MealInDayOptions } from '@/types/FoodSchedulingTypes';
 import TextOnlyCell from './TextOnlyCell';
 
 interface SingleMealProps {
     headerText: string;
-    meals: {
-        meal: Meal;
+    dishes: {
+        dish: Dish;
         date: Date;
     }[];
-    onMealPress: (meal: Meal, date: Date) => void;
+    onMealPress: (dish: Dish, date: Date) => void;
     setHeaderText: (newText: string) => void;
 }
 
@@ -28,22 +28,17 @@ function SingleMealBlock(props: SingleMealProps) {
                     disabled={true}
                 />
             </Cell>
-            {...props.meals.map((mealElement) => (
-                <Cell key={mealElement.date.toString()}>
+            {...props.dishes.map((dish) => (
+                <Cell key={dish.date.toString()}>
                     <UnstyledButton
                         style={{
                             width: '100%',
                             height: '100%',
                             textAlign: 'center',
                         }}
-                        onClick={() =>
-                            props.onMealPress(
-                                mealElement.meal,
-                                mealElement.date
-                            )
-                        }
+                        onClick={() => props.onMealPress(dish.dish, dish.date)}
                     >
-                        {mealElement?.meal?.mealName}
+                        {dish?.dish?.dishName}
                     </UnstyledButton>
                 </Cell>
             ))}

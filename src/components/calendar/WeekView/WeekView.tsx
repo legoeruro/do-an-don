@@ -11,21 +11,21 @@ import CourseMealBlock from './tableDisplayComponents/CourseMealBlock';
 
 import classes from '@/components/calendar/calendarStyles.module.css';
 import {
-    Meal,
+    Dish,
     MealInDayOptions,
     exampleMealInDayOptions,
-    placeholderMeal,
+    placeholderDish,
 } from '@/types/FoodSchedulingTypes';
 import PopupWindow from './popupWindow/PopupWindow';
-import { defaultRowHeader } from '@/stores/defaultValues/scheduleSliceDefault';
+import { defaultRowHeader } from '@/stores/defaultValues/scheduleDefaultInfo';
 
 export interface MealInDayInfo {
-    meals: Meal[];
+    dishes: Dish[];
     mealInDay: MealInDayOptions;
     date: Date;
 }
 const defaultMealInfo: MealInDayInfo = {
-    meals: [placeholderMeal],
+    dishes: [placeholderDish],
     mealInDay: exampleMealInDayOptions[0],
     date: new Date(),
 };
@@ -66,7 +66,7 @@ const WeekView = () => {
         updateSchedules(
             mealInDayInfo.date,
             mealInDayInfo.mealInDay,
-            mealInDayInfo.meals
+            mealInDayInfo.dishes
         );
 
         setIsEditing(false);
@@ -93,10 +93,10 @@ const WeekView = () => {
 
                 <SingleMealBlock
                     headerText={headerInfo.map.get(meal1)?.headerText ?? ''}
-                    meals={schedules.map((daySchedule) => ({
-                        meal:
+                    dishes={schedules.map((daySchedule) => ({
+                        dish:
                             daySchedule.mealInDays.get(meal1)?.[0] ??
-                            placeholderMeal,
+                            placeholderDish,
                         date: daySchedule.date,
                     }))}
                     setHeaderText={(newText) =>
@@ -105,9 +105,9 @@ const WeekView = () => {
                             headerText: newText,
                         })
                     }
-                    onMealPress={(meal, date) =>
+                    onMealPress={(dish, date) =>
                         onEditMeal({
-                            meals: [meal],
+                            dishes: [dish],
                             date: date,
                             mealInDay: 'breakfast',
                         })
@@ -115,9 +115,9 @@ const WeekView = () => {
                 />
                 <CourseMealBlock
                     headers={meal2Headers ?? defaultRowHeader}
-                    mealsEachDate={schedules.map((daySchedule) => ({
-                        meals: daySchedule.mealInDays.get(meal2) ?? [
-                            placeholderMeal,
+                    dishesInDate={schedules.map((daySchedule) => ({
+                        dishes: daySchedule.mealInDays.get(meal2) ?? [
+                            placeholderDish,
                         ],
                         date: daySchedule.date,
                     }))}
@@ -129,7 +129,7 @@ const WeekView = () => {
                     }
                     onMealPress={(meals, date) =>
                         onEditMeal({
-                            meals: meals,
+                            dishes: meals,
                             date: date,
                             mealInDay: meal2,
                         })
@@ -151,13 +151,13 @@ const WeekView = () => {
             </div>
             <PopupWindow
                 isOpen={isEditing}
-                meals={editMealInfo?.meals}
+                dishes={editMealInfo?.dishes}
                 onClose={() => setIsEditing(false)}
-                onConfirmEdit={(meals) => {
-                    if (!meals) return;
+                onConfirmEdit={(dishes) => {
+                    if (!dishes) return;
                     console.log(editMealInfo);
                     updateMealInDay({
-                        meals: meals,
+                        dishes: dishes,
                         mealInDay: editMealInfo?.mealInDay,
                         date: editMealInfo?.date,
                     });

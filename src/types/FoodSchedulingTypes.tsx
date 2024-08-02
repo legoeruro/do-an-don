@@ -1,6 +1,6 @@
 export type FoodDaySchedule = {
     date: Date;
-    mealInDays: Map<MealInDayOptions, Meal[]>;
+    mealInDays: Map<MealInDayOptions, Dish[]>;
     mealInDaysOrder: MealInDayOptions[];
 };
 
@@ -8,14 +8,14 @@ export const exampleMealInDayOptions = ['breakfast', 'lunch', 'snack'];
 //User-defined
 export type MealInDayOptions = String;
 
-export type Meal = {
-    mealId: string;
-    mealName: string;
-    mealType: MealTypes[];
+export type Dish = {
+    dishId: string;
+    dishName: string;
+    dishType: DishTypes[];
 };
 
 //TODO: Change this to user-defined (string)
-export const mealTypeOptions = [
+export const dishTypesOptions = [
     'drink',
     'side',
     'main',
@@ -24,10 +24,10 @@ export const mealTypeOptions = [
     'soup',
     'snack',
 ];
-export type MealTypes = (typeof mealTypeOptions)[number];
+export type DishTypes = (typeof dishTypesOptions)[number];
 
-export const placeholderMeal: Meal = {
-    mealId: '-1',
-    mealName: 'undefined',
-    mealType: [mealTypeOptions[0]],
+export const placeholderDish: Dish = {
+    dishId: '-1',
+    dishName: 'undefined',
+    dishType: [dishTypesOptions[0]],
 };

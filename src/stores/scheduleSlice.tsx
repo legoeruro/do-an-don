@@ -5,11 +5,11 @@ import {
 } from '@/types/CalendarComponentTypes';
 import {
     FoodDaySchedule,
-    Meal,
+    Dish,
     MealInDayOptions,
 } from '@/types/FoodSchedulingTypes';
 import { StateCreator } from 'zustand';
-import { scheduleSliceDefault } from './defaultValues/scheduleSliceDefault';
+import { scheduleSliceDefault } from './defaultValues/scheduleDefaultInfo';
 
 export interface IScheduleSliceProps {
     startingWeekDate: Date;
@@ -28,7 +28,7 @@ export interface IScheduleSlice extends IScheduleSliceProps {
     updateFoodSchedule: (
         date: Date,
         mealInDay: MealInDayOptions,
-        newMeals: Meal[]
+        newDishes: Dish[]
     ) => void;
 }
 
@@ -67,7 +67,7 @@ export const createScheduleSlice: StateCreator<IScheduleSlice> = (
     updateFoodSchedule: (
         date: Date,
         mealInDay: MealInDayOptions,
-        newMeals: Meal[]
+        newDishes: Dish[]
     ) => {
         set((state) => ({
             foodSchedules: state.foodSchedules.map((schedule) =>
@@ -76,7 +76,7 @@ export const createScheduleSlice: StateCreator<IScheduleSlice> = (
                           ...schedule,
                           mealInDays: new Map(schedule.mealInDays).set(
                               mealInDay,
-                              newMeals
+                              newDishes
                           ),
                       }
                     : schedule

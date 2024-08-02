@@ -1,9 +1,9 @@
-import { Grid, Paper, UnstyledButton } from '@mantine/core';
+import { Button, Grid, Paper, UnstyledButton } from '@mantine/core';
 import Cell from './Cell';
 import EditableString from '@/components/utilities/EditableString';
 import { createRef, memo, RefObject, useEffect, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
-import { Meal, placeholderMeal } from '@/types/FoodSchedulingTypes';
+import { Dish, placeholderDish } from '@/types/FoodSchedulingTypes';
 import { RowHeader } from '@/types/CalendarComponentTypes';
 import { headers } from 'next/headers';
 
@@ -11,12 +11,12 @@ import classes from '@/components/calendar/calendarStyles.module.css';
 
 interface CourseMealProps {
     headers: RowHeader;
-    mealsEachDate: {
-        meals: Meal[];
+    dishesInDate: {
+        dishes: Dish[];
         date: Date;
     }[];
     setHeaderText: (newHeaders: RowHeader) => void;
-    onMealPress: (meals: Meal[], date: Date) => void;
+    onMealPress: (dish: Dish[], date: Date) => void;
 }
 
 function CourseMealBlock(props: CourseMealProps) {
@@ -33,7 +33,7 @@ function CourseMealBlock(props: CourseMealProps) {
     //     (ref) => ref.current?.clientHeight ?? 0
     // );
 
-    console.log(props.mealsEachDate[0].meals);
+    console.log(props.dishesInDate[0].dishes);
 
     return (
         <Grid columns={8}>
@@ -75,13 +75,13 @@ function CourseMealBlock(props: CourseMealProps) {
                     </Grid.Col>
                 </Grid>
             </Cell>
-            {...props.mealsEachDate.map((daySchedule) => (
+            {...props.dishesInDate.map((daySchedule) => (
                 <Cell key={daySchedule.date.toString()}>
-                    <MultipleMeals
-                        meals={daySchedule.meals}
-                        onMealPress={() =>
+                    <MultipleDishes
+                        dishes={daySchedule.dishes}
+                        onDishesPress={() =>
                             props.onMealPress(
-                                daySchedule.meals,
+                                daySchedule.dishes,
                                 daySchedule.date
                             )
                         }
@@ -92,14 +92,13 @@ function CourseMealBlock(props: CourseMealProps) {
     );
 }
 
-const MultipleMeals = ({
-    meals,
-    onMealPress,
+const MultipleDishes = ({
+    dishes,
+    onDishesPress,
 }: {
-    meals: Meal[];
-    onMealPress: (meals: Meal[]) => void;
+    dishes: Dish[];
+    onDishesPress: (dishes: Dish[]) => void;
 }) => {
-    console.log(meals);
     return (
         <div>
             <UnstyledButton
@@ -108,22 +107,39 @@ const MultipleMeals = ({
                     height: '100%',
                     textAlign: 'center',
                 }}
-                onClick={() => onMealPress(meals)}
+                onClick={() => onDishesPress(dishes)}
+                component="p"
             >
-                <div>
-                    {...meals.map((mealElement) => (
-                        <Paper
-                            key={mealElement.mealId}
-                            className={classes.paperInCellWithMinSize}
-                        >
-                            {mealElement.mealName}
-                        </Paper>
-                    ))}
-                </div>
+                <DishesAsPaperMemo dishes={dishes} />
             </UnstyledButton>
         </div>
     );
 };
+
+// upon changing list of dishes, old items are not deleted and new items are added spmetimes
+// this is because the key is not unique. Mental note: key should always be unique
+const DishesAsPaper = ({ dishes }: { dishes: Dish[] }) => {
+    return (
+        <div>
+            {' '}
+            {...dishes.map((dish, index) => {
+                console.log(dish.dishName);
+                return (
+                    <Paper
+                        key={index}
+                        className={classes.paperInCellWithMinSize}
+                    >
+                        {dish.dishName}
+                    </Paper>
+                );
+            })}
+        </div>
+    );
+};
+
+const DishesAsPaperMemo = memo(DishesAsPaper, (prevProps, nextProps) => {
+    return isEqual(prevProps.dishes, nextProps.dishes);
+});
 
 // export default memo(CourseMealBlock, (prevProps, nextProps) => {
 //     return (
